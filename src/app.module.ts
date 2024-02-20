@@ -6,16 +6,21 @@ import { CommentsModule } from './comments/comments.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { AuthGuard } from './user_auth/auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [UsersModule, PostsModule, CommentsModule, PrismaModule,
     JwtModule.register({
-      global: true,
-      secret: process.env.ACCESS_TOKEN_SECRET,
-      signOptions: { expiresIn: process.env.EXPIRE_IN },
+      global: true
     }),
   ],
   controllers: [],
-  providers: [AppService],
+  providers: [AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}

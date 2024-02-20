@@ -37,19 +37,23 @@ export class UsersService {
 
     const accessToken = this.jwtService.sign(
       {
-        id: user.id,
+        sub: user.id,
+        email : user.email,
+        name : user.name
       },
       {
-        secret: process.env.ACCESS_TOKEN_SECRET
+        secret: process.env.ACCESS_TOKEN_SECRET,
+        expiresIn : process.env.ACCESS_TOKEN_EXPIRE_IN
       },
     );
 
     const refreshToken = this.jwtService.sign(
       {
-        id: user.id,
+        sub: user.id,
       },
       {
-        secret: process.env.REFRESH_TOKEN_SECRET
+        secret: process.env.REFRESH_TOKEN_SECRET,
+        expiresIn : process.env.REFRESH_TOKEN_EXPIRE_IN
       },
     );
 
