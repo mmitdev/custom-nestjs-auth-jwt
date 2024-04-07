@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/user.dto';
+import { CreateUserDto, LoginUserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -34,6 +34,61 @@ export class UsersService {
         password: hashedPassword,
       },
     });
+
+    const accessToken = this.jwtService.sign(
+      {
+        sub: user.id,
+        email : user.email,
+        name : user.name
+      },
+      {
+        secret: process.env.ACCESS_TOKEN_SECRET,
+        expiresIn : process.env.ACCESS_TOKEN_EXPIRE_IN
+      },
+    );
+
+    const refreshToken = this.jwtService.sign(
+      {
+        sub: user.id,
+      },
+      {
+        secret: process.env.REFRESH_TOKEN_SECRET,
+        expiresIn : process.env.REFRESH_TOKEN_EXPIRE_IN
+      },
+    );
+
+    return {
+        accessToken,
+        refreshToken
+    }
+  }
+
+   async login(loginUserDto: LoginUserDto) {
+    const { email, password } = loginUserDto;
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User does not exist!');
+    }
+
+     const isPasswordValid = await bcrypt.compare(password, user.password);
+     
+     if (!isPasswordValid) {
+             throw new BadRequestException('Password is incorrect!');
+     }
+
+    // const user = await this.prisma.user.create({
+    //   data: {
+    //     email,
+    //     name,
+    //     password: hashedPassword,
+    //   },
+    // });
 
     const accessToken = this.jwtService.sign(
       {
