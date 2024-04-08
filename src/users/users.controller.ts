@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { CreateUserDto, LoginUserDto } from './dto/user.dto';
+import { CheckUserEmailDto, CreateUserDto, LoginUserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/user_auth/auth.guard';
@@ -22,6 +22,15 @@ export class UsersController {
   @Post('login')
   async login(@Body() loginUserDto: LoginUserDto) {
     const response = await this.userService.login(loginUserDto);
+    return {
+      response,
+    };
+  }
+
+   @Public()
+  @Post('checkUser')
+  async checkUserExists(@Body() checkUserEmailDto: CheckUserEmailDto) {
+    const response = await this.userService.findByEmail(checkUserEmailDto);
     return {
       response,
     };

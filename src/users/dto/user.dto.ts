@@ -35,4 +35,13 @@ export class LoginUserDto {
 
 }
 
+export class CheckUserEmailDto {
+    
+    @ApiProperty()
+    @IsEmail({},{message: "Email is invalid"})
+    @IsNotEmpty({message : "Email is required."})
+    email : string;
+
+}
+
 

@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateUserDto, LoginUserDto } from './dto/user.dto';
+import { CheckUserEmailDto, CreateUserDto, LoginUserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -116,5 +116,15 @@ export class UsersService {
         accessToken,
         refreshToken
     }
+  }
+
+  async findByEmail(checkUserEmailDto: CheckUserEmailDto) {
+    const { email} = checkUserEmailDto
+        const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+        });
+    return !!user;
   }
 }
